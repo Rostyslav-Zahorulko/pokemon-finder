@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
+import { ImSearch } from 'react-icons/im';
 
 class SearchForm extends Component {
   state = {
@@ -31,11 +32,11 @@ class SearchForm extends Component {
 
     return (
       <form autoComplete="off" onSubmit={this.handleSubmit}>
-        <label>
-          Enter pokemon name
-          <input type="text" value={pokemonName} onChange={this.handleChange} />
-        </label>
-        <button type="submit">Search pokemon</button>
+        <input type="text" value={pokemonName} onChange={this.handleChange} />
+
+        <button type="submit">
+          Search <ImSearch />
+        </button>
       </form>
     );
   }

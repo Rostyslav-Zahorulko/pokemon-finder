@@ -5,7 +5,7 @@ const fetchPokemon = pokemonName =>
     }
 
     return Promise.reject(
-      new Error(`There is no pokemon with name ${pokemonName}`),
+      new Error(`There is no pokemon named ${pokemonName}`),
     );
   });
 

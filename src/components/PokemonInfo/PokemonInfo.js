@@ -1,11 +1,19 @@
 import { Component } from 'react';
+import PokemonDataView from '../PokemonDataView';
+import PokemonPendingView from '../PokemonPendingView';
+import PokemonErrorView from '../PokemonErrorView';
 import pokemonApi from '../../services/pokemon-api';
+
+const IDLE = 'idle';
+const PENDING = 'pending';
+const REJECTED = 'rejected';
+const RESOLVED = 'resolved';
 
 class PokemonInfo extends Component {
   state = {
     pokemon: null,
     error: null,
-    isLoading: false,
+    status: IDLE,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -18,41 +26,33 @@ class PokemonInfo extends Component {
   }
 
   searchPokemon = pokemonName => {
-    this.setState({ pokemon: null, error: null, isLoading: true });
+    this.setState({ status: PENDING });
 
     pokemonApi
       .fetchPokemon(pokemonName)
-      .then(pokemon => this.setState({ pokemon }))
-      .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
+      .then(pokemon => this.setState({ pokemon, status: RESOLVED }))
+      .catch(error => this.setState({ error, status: REJECTED }));
   };
 
   render() {
-    const { pokemon, error, isLoading } = this.state;
+    const { pokemon, error, status } = this.state;
     const { pokemonName } = this.props;
 
-    return (
-      <div>
-        <h1>Pokemon Info</h1>
+    if (status === IDLE) {
+      return <p>Enter pokemon name</p>;
+    }
 
-        {!pokemonName && <p>Enter pokemon name</p>}
+    if (status === PENDING) {
+      return <PokemonPendingView pokemonName={pokemonName} />;
+    }
 
-        {isLoading && <p>Loading...</p>}
+    if (status === RESOLVED) {
+      return <PokemonDataView pokemon={pokemon} />;
+    }
 
-        {pokemon && (
-          <div>
-            <p>{pokemon.name}</p>
-            <img
-              src={pokemon.sprites.other['official-artwork'].front_default}
-              alt={pokemon.name}
-              width="240"
-            />
-          </div>
-        )}
-
-        {error && <p>{error.message}</p>}
-      </div>
-    );
+    if (status === REJECTED) {
+      return <PokemonErrorView message={error.message} />;
+    }
   }
 }
 
