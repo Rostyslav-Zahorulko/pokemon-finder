@@ -1,19 +1,15 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { ImSearch } from 'react-icons/im';
 
-class SearchForm extends Component {
-  state = {
-    pokemonName: '',
+export default function SearchForm({ onSubmit }) {
+  const [pokemonName, setPokemonName] = useState('');
+
+  const handleChange = e => {
+    setPokemonName(e.currentTarget.value.toLowerCase());
   };
 
-  handleChange = e => {
-    this.setState({ pokemonName: e.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = e => {
-    const { pokemonName } = this.state;
-    const { onSubmit } = this.props;
+  const handleSubmit = e => {
     const trimmedPokemonName = pokemonName.trim();
 
     e.preventDefault();
@@ -24,22 +20,16 @@ class SearchForm extends Component {
     }
 
     onSubmit(trimmedPokemonName);
-    this.setState({ pokemonName: '' });
+    setPokemonName('');
   };
 
-  render() {
-    const { pokemonName } = this.state;
+  return (
+    <form autoComplete="off" onSubmit={handleSubmit}>
+      <input type="text" value={pokemonName} onChange={handleChange} />
 
-    return (
-      <form autoComplete="off" onSubmit={this.handleSubmit}>
-        <input type="text" value={pokemonName} onChange={this.handleChange} />
-
-        <button type="submit">
-          Search <ImSearch />
-        </button>
-      </form>
-    );
-  }
+      <button type="submit">
+        Search <ImSearch />
+      </button>
+    </form>
+  );
 }
-
-export default SearchForm;

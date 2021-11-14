@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PokemonDataView from '../PokemonDataView';
 import PokemonPendingView from '../PokemonPendingView';
 import PokemonErrorView from '../PokemonErrorView';
@@ -9,51 +9,58 @@ const PENDING = 'pending';
 const REJECTED = 'rejected';
 const RESOLVED = 'resolved';
 
-class PokemonInfo extends Component {
-  state = {
-    pokemon: null,
-    error: null,
-    status: IDLE,
-  };
+let count = 0;
 
-  componentDidUpdate(prevProps, prevState) {
-    const previousPokemonName = prevProps.pokemonName;
-    const currentPokemonName = this.props.pokemonName;
+export default function PokemonInfo({ pokemonName }) {
+  const [pokemon, setPokemon] = useState(null);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState(IDLE);
 
-    if (previousPokemonName !== currentPokemonName) {
-      this.searchPokemon(currentPokemonName);
+  count += 1;
+  console.log('count: ', count);
+
+  useEffect(() => {
+    console.log('Start Effect');
+
+    if (!pokemonName) {
+      return;
     }
-  }
 
-  searchPokemon = pokemonName => {
-    this.setState({ status: PENDING });
+    setStatus(PENDING);
 
     pokemonApi
       .fetchPokemon(pokemonName)
-      .then(pokemon => this.setState({ pokemon, status: RESOLVED }))
-      .catch(error => this.setState({ error, status: REJECTED }));
-  };
+      .then(pokemon => {
+        console.log('pokemonName: ', pokemonName);
+        console.log('pokemon: ', pokemon);
+        setPokemon(pokemon);
+        setStatus(RESOLVED);
+      })
+      .catch(error => {
+        console.log('pokemonName: ', pokemonName);
+        console.log('error: ', error);
+        setError(error);
+        setStatus(REJECTED);
+      });
+  }, [pokemonName]);
 
-  render() {
-    const { pokemon, error, status } = this.state;
-    const { pokemonName } = this.props;
+  if (status === IDLE) {
+    console.log('IDLE');
+    return <p>Enter pokemon name</p>;
+  }
 
-    if (status === IDLE) {
-      return <p>Enter pokemon name</p>;
-    }
+  if (status === PENDING) {
+    console.log('PENDING');
+    return <PokemonPendingView pokemonName={pokemonName} />;
+  }
 
-    if (status === PENDING) {
-      return <PokemonPendingView pokemonName={pokemonName} />;
-    }
+  if (status === RESOLVED) {
+    console.log('RESOLVED');
+    return <PokemonDataView pokemon={pokemon} />;
+  }
 
-    if (status === RESOLVED) {
-      return <PokemonDataView pokemon={pokemon} />;
-    }
-
-    if (status === REJECTED) {
-      return <PokemonErrorView message={error.message} />;
-    }
+  if (status === REJECTED) {
+    console.log('REJECTED');
+    return <PokemonErrorView message={error.message} />;
   }
 }
-
-export default PokemonInfo;

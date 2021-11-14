@@ -1,4 +1,6 @@
 function PokemonDataView({ pokemon: { sprites, name, stats } }) {
+  console.log('DataView');
+
   return (
     <div>
       <img

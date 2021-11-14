@@ -3,6 +3,8 @@ import PokemonDataView from '../PokemonDataView';
 import pendingImage from '../../images/pending-icon.png';
 
 function PokemonPendingView({ pokemonName }) {
+  console.log('PendingView');
+
   const pokemon = {
     sprites: {
       other: {
